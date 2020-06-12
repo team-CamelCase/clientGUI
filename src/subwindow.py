@@ -1,7 +1,7 @@
 import sys
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
-from automessage import autoMessage
+from selectmessage import selectMessage
 from manualmessage import manualMessage
 
 class subWindow(QDialog):    
@@ -45,11 +45,11 @@ class subWindow(QDialog):
         numMsg, OK = QInputDialog.getInt(self, "Auto Message Input",
                                          "Select number of messages to send")
         if OK:
-            automsg = autoMessage(numMsg, self.textIP)
-            r = automsg.showAutoMsgWindow()
+            selectmsg = selectMessage(numMsg, self.textIP)
+            r = selectmsg.showSelectWindow()
 
         if r is not None:
-            print("Auto Sending SUCCESS!")
+            print("Selected Auto Sending!")
             self.accept()
             
     def manualButtonClicked(self):
@@ -62,7 +62,7 @@ class subWindow(QDialog):
             r = manualmsg.showManualMsgWindow()
 
         if r is not None:
-            print("Manual Sending SUCCESS!")
+            print("Manual Sending SUCCESS")
             self.accept()
 
     def showSubWindow(self):

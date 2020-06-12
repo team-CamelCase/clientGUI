@@ -22,16 +22,16 @@ class manualMessage(QDialog):
         font = notice.font()
         font.setPointSize(20)
         notice.setFont(font)
-        notice.setText("Changing text message into voice file...")
+        notice.setText("음성 파일로 변환 중입니다...")
         self.notice = notice
 
         getVoiceFile = QProcess(self)
         getVoiceFile.finished.connect(self.getVoiceFileFinished)
         getVoiceFile.start('python', ['test.py'])
 
-        backButton = QPushButton("Go Back")
+        backButton = QPushButton("뒤로 가기")
         backButton.clicked.connect(self.backButtonClicked)
-
+        
         layout.addWidget(self.notice)
         layout.addWidget(backButton)
         layout.addStretch(1)
@@ -41,8 +41,20 @@ class manualMessage(QDialog):
         self.accept()
 
     def getVoiceFileFinished(self, exitCode, exitStatus):
+        print(exitCode)
         if exitCode == 0: #success
-            self.notice.setText("Sending file...")
+            self.notice.setText("파일 경로를 얻어오고 있습니다...")
+
+            getFile = QProcess(self)
+            getFile.finished.connect(self.getFileFinished)
+            getFile.start('python', ['test.py'])
+        else: #fail
+            self.notice.setText("Something wrong.. Try again!")
+
+    def getFileFinished(self, exitCode, exitStatus):
+        print(exitCode)
+        if exitCode == 0: #success
+            self.notice.setText("파일을 전송하고 있습니다...")
 
             sendFile = QProcess(self)
             sendFile.finished.connect(self.sendFileFinished)
@@ -51,8 +63,20 @@ class manualMessage(QDialog):
             self.notice.setText("Something wrong.. Try again!")
 
     def sendFileFinished(self, exitCode, exitStatus):
+        print(exitCode)
         if exitCode == 0:
-            self.notice.setText("Done!")
+            self.notice.setText("라디오에 송출 중입니다...")
+
+            executeRadio = QProcess(self)
+            executeRadio.finished.connect(self.executeRadioFinished)
+            executeRadio.start('python', ['test.py'])
+        else:
+            self.notice.setText("Something wrong.. Try again!")
+
+    def executeRadioFinished(self, exitCode, exitStatus):
+        print(exitCode)
+        if exitCode == 0:
+            self.notice.setText("수동 전송 완료!")
         else:
             self.notice.setText("Something wrong.. Try again!")
 
