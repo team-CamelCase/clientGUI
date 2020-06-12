@@ -25,9 +25,10 @@ class manualMessage(QDialog):
         notice.setText("음성 파일로 변환 중입니다...")
         self.notice = notice
 
-        getVoiceFile = QProcess(self)
-        getVoiceFile.finished.connect(self.getVoiceFileFinished)
-        getVoiceFile.start('python', ['test.py'])
+        makeVoiceFile = QProcess(self)
+        makeVoiceFile.finished.connect(self.makeVoiceFileFinished)
+        makeVoiceFile.start('python', ['makeVoiceFile.py', '--text', self.manualMsg])
+        self.makeVoiceFile = makeVoiceFile
 
         backButton = QPushButton("뒤로 가기")
         backButton.clicked.connect(self.backButtonClicked)
@@ -40,9 +41,13 @@ class manualMessage(QDialog):
 
         self.accept()
 
-    def getVoiceFileFinished(self, exitCode, exitStatus):
-        print(exitCode)
-        if exitCode == 0: #success
+    def makeVoiceFileFinished(self, exitCode, exitStatus):
+        output = str(self.makeVoiceFile.readAll())
+        output = output[2:-1] #detach first "b'", last "'"
+        status = output.split("\\r\\n")[0]
+        print(status)
+
+        if status == '200': #success
             self.notice.setText("파일 경로를 얻어오고 있습니다...")
 
             getFile = QProcess(self)

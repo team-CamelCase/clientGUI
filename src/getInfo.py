@@ -3,7 +3,7 @@ def test(num1, num2):
 	return num1+num2
 
 if __name__ == '__main__':
-	print("Info 1: aa.wav")
+        print("Info 1: aa.wav")
 	print("Info 2: bb.wav")
 	print("Info 3: cc.wav")
 	print("Info 4: cc.wav")
