@@ -5,10 +5,11 @@ from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 
 class autoMessage(QDialog):    
-    def __init__(self, numMsg, textIP, infoList):
+    def __init__(self, numMsg, textIP, frequency, infoList):
         super().__init__()
         self.numMsg = numMsg
         self.textIP = textIP
+        self.frequency = frequency
         self.infoList = infoList
         self.initUI()
         

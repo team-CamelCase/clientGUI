@@ -2,12 +2,13 @@ import sys
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 from selectmessage import selectMessage
-from manualmessage import manualMessage
+from writemessage import writeMessage
 
 class subWindow(QDialog):    
-    def __init__(self, textIP):
+    def __init__(self, textIP, frequency):
         super().__init__()
         self.textIP = textIP
+        self.frequency = frequency
         self.initUI()
         
     def initUI(self):
@@ -45,7 +46,7 @@ class subWindow(QDialog):
         numMsg, OK = QInputDialog.getInt(self, "Auto Message Input",
                                          "Select number of messages to send")
         if OK:
-            selectmsg = selectMessage(numMsg, self.textIP)
+            selectmsg = selectMessage(numMsg, self.textIP, self.frequency)
             r = selectmsg.showSelectWindow()
 
         if r is not None:
@@ -54,15 +55,13 @@ class subWindow(QDialog):
             
     def manualButtonClicked(self):
         #self.reject()
-        manualMsg, OK = QInputDialog.getText(self, "Manual Message Input",
-                                         "Write input message to send")
-
-        if OK:
-            manualmsg = manualMessage(manualMsg, self.textIP)
-            r = manualmsg.showManualMsgWindow()
+        #manualMsg, OK = QInputDialog.getText(self, "Manual Message Input",
+        #                                 "Write input message to send")
+        writemsg = writeMessage(self.textIP, self.frequency)
+        r = writemsg.showWriteWindow()
 
         if r is not None:
-            print("Manual Sending SUCCESS")
+            print("Selected Manual Sending!")
             self.accept()
 
     def showSubWindow(self):

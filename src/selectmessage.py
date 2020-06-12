@@ -6,16 +6,17 @@ from PyQt5.QtGui import *
 from automessage import autoMessage
 
 class selectMessage(QDialog):    
-    def __init__(self, numMsg, textIP):
+    def __init__(self, numMsg, textIP, frequency):
         super().__init__()
         self.numMsg = numMsg
         self.textIP = textIP
+        self.frequency = frequency
         self.initUI()
         
     def initUI(self):
         self.setWindowTitle('Auto Message Transmission')
         self.setGeometry(100, 100, 400, 300)
-
+        
         layout = QVBoxLayout()
         layout.addStretch(1)
 
@@ -29,14 +30,17 @@ class selectMessage(QDialog):
             
         getInfos = QProcess(self)
         #getInfos.finished.connect(self.getInfosFinished)
-        getInfos.start('python', ['getInfo.py'])
+        getInfos.start('python', ['getInfoList.py',
+                                  '--numMsg', str(self.numMsg)])
         getInfos.waitForFinished()
-        self.getInfos = getInfos
         output = str(getInfos.readAll())
         output = output[2:-1] #detach first "b'", last "'"
-        infos = list(output.split("\\n"))
-
-        print(infos)
+        output = list(output.split("\\r\\n"))
+        status = output[0]
+        jsonResponse = output[1]
+        print(status)
+        print(jsonResponse)
+        #self.getInfos = getInfos
         
         #set checkbox ui for each info labels
         self.infoCheckBoxes = []
@@ -58,7 +62,6 @@ class selectMessage(QDialog):
 
         self.accept()
 
-
     def completeButtonClicked(self):
         infoToSend = []
 
@@ -68,7 +71,8 @@ class selectMessage(QDialog):
 
         print(infoToSend)
             
-        automsg = autoMessage(self.numMsg, self.textIP, infoToSend)
+        automsg = autoMessage(self.numMsg, self.textIP,
+                              self.frequency, infoToSend)
         r = automsg.showAutoMsgWindow()
 
         if r is not None:

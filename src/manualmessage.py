@@ -4,10 +4,12 @@ from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 
 class manualMessage(QDialog):    
-    def __init__(self, manualMsg, textIP):
+    def __init__(self, manualMsgTitle, manualMsgContent, textIP, frequency):
         super().__init__()
-        self.manualMsg = manualMsg
+        self.manualMsgTitle = manualMsgTitle
+        self.manualMsgContent = manualMsgContent
         self.textIP = textIP
+        self.frequency = frequency
         self.initUI()
         
     def initUI(self):
@@ -22,13 +24,15 @@ class manualMessage(QDialog):
         font = notice.font()
         font.setPointSize(20)
         notice.setFont(font)
-        notice.setText("음성 파일로 변환 중입니다...")
+        notice.setText("음성 파일 경로를 받아오는 중입니다...")
         self.notice = notice
 
-        makeVoiceFile = QProcess(self)
-        makeVoiceFile.finished.connect(self.makeVoiceFileFinished)
-        makeVoiceFile.start('python', ['makeVoiceFile.py', '--text', self.manualMsg])
-        self.makeVoiceFile = makeVoiceFile
+        getVoiceFile = QProcess(self)
+        getVoiceFile.finished.connect(self.getVoiceFileFinished)
+        getVoiceFile.start('python', ['getVoiceFile.py',
+                                      '--title', self.manualMsgTitle,
+                                      '--content', self.manualMsgContent])
+        self.getVoiceFile = getVoiceFile
 
         backButton = QPushButton("뒤로 가기")
         backButton.clicked.connect(self.backButtonClicked)
@@ -41,40 +45,59 @@ class manualMessage(QDialog):
 
         self.accept()
 
-    def makeVoiceFileFinished(self, exitCode, exitStatus):
-        output = str(self.makeVoiceFile.readAll())
+    def getVoiceFileFinished(self, exitCode, exitStatus):
+        output = str(self.getVoiceFile.readAll())
         output = output[2:-1] #detach first "b'", last "'"
-        status = output.split("\\r\\n")[0]
-        print(status)
+        output = list(output.split("\\r\\n"))
+        status = output[0]
+        self.voiceFilePath = output[1]
+        print(status, self.voiceFilePath)
 
         if status == '200': #success
-            self.notice.setText("파일 경로를 얻어오고 있습니다...")
+            self.notice.setText("저장소 토큰을 얻어오고 있습니다...")
 
-            getFile = QProcess(self)
-            getFile.finished.connect(self.getFileFinished)
-            getFile.start('python', ['test.py'])
+            getToken = QProcess(self)
+            getToken.finished.connect(self.getTokenFinished)
+            getToken.start('python', ['getToken.py'])
         else: #fail
             self.notice.setText("Something wrong.. Try again!")
 
-    def getFileFinished(self, exitCode, exitStatus):
-        print(exitCode)
-        if exitCode == 0: #success
+    def getTokenFinished(self, exitCode, exitStatus):
+        output = str(self.getToken.readAll())
+        output = output[2:-1] #detach first "b'", last "'"
+        output = list(output.split("\\r\\n"))
+        status = output[0]
+        self.token = output[1]
+        print(status, self.token)
+        
+        if status == '200': #success
             self.notice.setText("파일을 전송하고 있습니다...")
 
             sendFile = QProcess(self)
             sendFile.finished.connect(self.sendFileFinished)
-            sendFile.start('python', ['test.py'])
+            sendFile.start('python', ['sendFile.py',
+                                      '--ip', self.textIP,
+                                      '--path', self.voiceFilePath,
+                                      '--token', self.token])
         else: #fail
             self.notice.setText("Something wrong.. Try again!")
 
     def sendFileFinished(self, exitCode, exitStatus):
-        print(exitCode)
-        if exitCode == 0:
+        output = str(self.getToken.readAll())
+        output = output[2:-1] #detach first "b'", last "'"
+        output = list(output.split("\\r\\n"))
+        status = output[0]
+        print(status)
+        
+        if status == '200':
             self.notice.setText("라디오에 송출 중입니다...")
 
             executeRadio = QProcess(self)
             executeRadio.finished.connect(self.executeRadioFinished)
-            executeRadio.start('python', ['test.py'])
+            executeRadio.start('python', ['executeRadio.py',
+                                          '--ip', self.textIP,
+                                          '--filename', self.manualMsgTitle,
+                                          '--frequency', self.frequency])
         else:
             self.notice.setText("Something wrong.. Try again!")
 
@@ -90,4 +113,3 @@ class manualMessage(QDialog):
         
     def showManualMsgWindow(self):
         return super().exec_()
-
