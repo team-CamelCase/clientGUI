@@ -2,16 +2,12 @@ import requests
 import argparse
 
 if __name__ == '__main__':
-    #parser = argparse.ArgumentParser()
-    #parser.add_argument('--text', type=str)
-
-    #args = parser.parse_args()
-
-    url = "http://localhost:8080/api/v1/speech"
-    #data = {'text': args.text}
+    url = "http://localhost:8000/api/v1/token"
 
     response = requests.get(url)
+    
+    jsonFile = response.json()
 
     print(response.status_code)
-    #get token
+    print(jsonFile["access_token"])
 

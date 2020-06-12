@@ -11,7 +11,8 @@ if __name__ == '__main__':
     url = "http://localhost:8080/api/v1/speech"
     data = {'title': args.title, 'content':args.content}
 
+    #print(data)
     response = requests.post(url, data = data)
 
     print(response.status_code)
-    #get voice file path
+    print(response.text)

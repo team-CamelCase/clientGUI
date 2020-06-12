@@ -5,12 +5,12 @@ from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 
 class autoMessage(QDialog):    
-    def __init__(self, numMsg, textIP, frequency, infoList):
+    def __init__(self, numMsg, textIP, frequency, titleStr):
         super().__init__()
         self.numMsg = numMsg
         self.textIP = textIP
         self.frequency = frequency
-        self.infoList = infoList
+        self.titleStr = titleStr
         self.initUI()
         
     def initUI(self):
@@ -25,12 +25,15 @@ class autoMessage(QDialog):
         font = notice.font()
         font.setPointSize(20)
         notice.setFont(font)
-        notice.setText("파일 경로를 얻어오고 있습니다...")
+        notice.setText("파일 경로를 받아오고 있습니다...")
         self.notice = notice
 
         getFiles = QProcess(self)
         getFiles.finished.connect(self.getFilesFinished)
-        getFiles.start('python', ['test.py'])
+        getFiles.start('python', ['getFiles.py',
+                                  '--numMsg', str(self.numMsg),
+                                  '--titleStr', self.titleStr])
+        self.getFiles = getFiles
         
         backButton = QPushButton("뒤로 가기")
         backButton.clicked.connect(self.backButtonClicked)
@@ -44,8 +47,15 @@ class autoMessage(QDialog):
         self.accept()
 
     def getFilesFinished(self, exitCode, exitStatus):
-        print(exitCode)
-        if exitCode == 0: #success
+        output = str(self.getFiles.readAll())
+        output = output[2:-1] #detach first "b'", last "'"
+        output = list(output.split("\\r\\n"))
+        status = output[0]
+        voiceFilePaths = output[1]
+        voiceFilePaths = voiceFilePaths[1:-1] #detach '{', '}'
+        print(status, voiceFilePaths)
+
+        if status == '200': #success
             self.notice.setText("파일을 전송하고 있습니다...")
 
             sendFiles = QProcess(self)

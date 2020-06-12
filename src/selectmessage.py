@@ -37,15 +37,16 @@ class selectMessage(QDialog):
         output = output[2:-1] #detach first "b'", last "'"
         output = list(output.split("\\r\\n"))
         status = output[0]
-        jsonResponse = output[1]
-        print(status)
-        print(jsonResponse)
+        titleList = output[1]
+        titleList = titleList[1:-1] #detach '[', ']'
+        titleList = list(titleList.split(', '))
+        print(titleList, type(titleList))
         #self.getInfos = getInfos
         
         #set checkbox ui for each info labels
         self.infoCheckBoxes = []
-        for idx, info in enumerate(infoLabels):
-            info = QCheckBox(infos[idx], self)
+        for idx, info in enumerate(titleList):
+            info = QCheckBox(titleList[idx][1:-1], self)
             self.infoCheckBoxes.append(info)
             layout.addWidget(info)
             
@@ -63,12 +64,14 @@ class selectMessage(QDialog):
         self.accept()
 
     def completeButtonClicked(self):
-        infoToSend = []
+        infoToSend = ""
 
         for infoCheckBox in self.infoCheckBoxes:
             if infoCheckBox.isChecked():
-                infoToSend.append(infoCheckBox.text())
+                infoToSend += infoCheckBox.text()
+                infoToSend += ','
 
+        infoToSend = infoToSend[:-1] #detach last ','
         print(infoToSend)
             
         automsg = autoMessage(self.numMsg, self.textIP,

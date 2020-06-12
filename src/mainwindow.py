@@ -15,12 +15,11 @@ class mainWindow(QMainWindow):
         layout = QVBoxLayout()
         layout.addStretch(1)
 
-<<<<<<< HEAD
         #rasberry pi ip
         ip = QLabel("라즈베리파이 IP 주소:")
         ip.setAlignment(Qt.AlignCenter)
         font = ip.font()
-        font.setPointSize(20)
+        font.setPointSize(25)
         ip.setFont(font)
         self.ip = ip
 
@@ -34,7 +33,7 @@ class mainWindow(QMainWindow):
         frequency = QLabel("주파수 설정:")
         frequency.setAlignment(Qt.AlignCenter)
         font = frequency.font()
-        font.setPointSize(20)
+        font.setPointSize(25)
         frequency.setFont(font)
         self.frequency = frequency
 
@@ -43,21 +42,6 @@ class mainWindow(QMainWindow):
         font.setPointSize(20)
         freqEdit.setFont(font)
         self.freqEdit = freqEdit
-=======
-        label = QLabel("라즈베리파이 IP를 입력해주세요")
-        label.setAlignment(Qt.AlignCenter)
-        font = label.font()
-        font.setPointSize(25)
-        label.setFont(font)
-        self.label = label
-
-        edit = QLineEdit()
-        font = edit.font()
-        font.setPointSize(20)
-        edit.setFont(font)
-        edit.setAlignment(Qt.AlignCenter)
-        self.edit = edit
->>>>>>> 03dbc0e09f643e6176e281552beaafa61d74fd04
 
         button = QPushButton("시작하기")
         button.clicked.connect(self.onButtonClicked)

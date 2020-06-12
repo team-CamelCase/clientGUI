@@ -59,6 +59,7 @@ class manualMessage(QDialog):
             getToken = QProcess(self)
             getToken.finished.connect(self.getTokenFinished)
             getToken.start('python', ['getToken.py'])
+            self.getToken = getToken
         else: #fail
             self.notice.setText("Something wrong.. Try again!")
 
@@ -78,7 +79,9 @@ class manualMessage(QDialog):
             sendFile.start('python', ['sendFile.py',
                                       '--ip', self.textIP,
                                       '--path', self.voiceFilePath,
-                                      '--token', self.token])
+                                      '--token', self.token,
+                                      '--numMsg', str(1)])
+            self.sendFile = sendFile
         else: #fail
             self.notice.setText("Something wrong.. Try again!")
 
@@ -98,6 +101,7 @@ class manualMessage(QDialog):
                                           '--ip', self.textIP,
                                           '--filename', self.manualMsgTitle,
                                           '--frequency', self.frequency])
+            self.executeRadio = executeRadio
         else:
             self.notice.setText("Something wrong.. Try again!")
 

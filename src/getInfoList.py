@@ -11,7 +11,12 @@ if __name__ == '__main__':
 
     response = requests.get(url)
 
-    json_file = response.json()
+    jsonFile = response.json()
+
+    titleList = []
+
+    for i in range(int(args.numMsg)):
+        titleList.append(jsonFile[i]['title'])
 
     print(response.status_code)
-    print(json_file)
+    print(titleList)
