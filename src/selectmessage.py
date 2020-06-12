@@ -34,9 +34,9 @@ class selectMessage(QDialog):
         self.getInfos = getInfos
         output = str(getInfos.readAll())
         output = output[2:-1] #detach first "b'", last "'"
-        infos = list(output.split("\\r\\n"))
+        infos = list(output.split("\\n"))
 
-        #print(infos)
+        print(infos)
         
         #set checkbox ui for each info labels
         self.infoCheckBoxes = []
