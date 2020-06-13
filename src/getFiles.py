@@ -15,7 +15,7 @@ if __name__ == '__main__':
     response = requests.get(url)
     jsonFile = response.json()
     
-    fileNameList = {}
+    fileNameStr = ""
     
     for i in range(len(titleList)):
         title = titleList[i]
@@ -23,7 +23,9 @@ if __name__ == '__main__':
 
         for j in range(int(args.numMsg)):
             if title == jsonFile[j]['title']:
-                fileNameList[title] = jsonFile[j]['fileName']
+                fileNameStr += (str(jsonFile[j]['fileName']) + ",")
 
+    fileNameStr = fileNameStr[:-1] #detach last ","
     print(response.status_code)
-    print(fileNameList)
+    print(len(titleList))
+    print(fileNameStr)

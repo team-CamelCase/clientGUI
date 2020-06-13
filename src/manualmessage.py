@@ -79,27 +79,33 @@ class manualMessage(QDialog):
             sendFile.start('python', ['sendFile.py',
                                       '--ip', self.textIP,
                                       '--path', self.voiceFilePath,
-                                      '--token', self.token,
-                                      '--numMsg', str(1)])
+                                      '--token', self.token])
+            print(self.textIP, self.voiceFilePath, self.token)
             self.sendFile = sendFile
         else: #fail
             self.notice.setText("Something wrong.. Try again!")
 
     def sendFileFinished(self, exitCode, exitStatus):
-        output = str(self.getToken.readAll())
+        '''
+        output = str(self.sendFile.readAll())
         output = output[2:-1] #detach first "b'", last "'"
         output = list(output.split("\\r\\n"))
         status = output[0]
         print(status)
-        
-        if status == '200':
+        '''
+        print(str(self.sendFile.readAll()))
+        print(exitCode)
+        print("---******8-------")
+        #print(str(self.sendFile.readAll()))
+        if exitCode == 0:
             self.notice.setText("라디오에 송출 중입니다...")
 
             executeRadio = QProcess(self)
             executeRadio.finished.connect(self.executeRadioFinished)
+            print(self.textIP, self.voiceFilePath, self.frequency)
             executeRadio.start('python', ['executeRadio.py',
                                           '--ip', self.textIP,
-                                          '--filename', self.manualMsgTitle,
+                                          '--filename', self.voiceFilePath,
                                           '--frequency', self.frequency])
             self.executeRadio = executeRadio
         else:
@@ -107,6 +113,8 @@ class manualMessage(QDialog):
 
     def executeRadioFinished(self, exitCode, exitStatus):
         print(exitCode)
+        print("&&&&&&&&&&&&&&&")
+        print(str(self.executeRadio.readAll()))
         if exitCode == 0:
             self.notice.setText("수동 전송 완료!")
         else:

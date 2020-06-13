@@ -51,32 +51,65 @@ class autoMessage(QDialog):
         output = output[2:-1] #detach first "b'", last "'"
         output = list(output.split("\\r\\n"))
         status = output[0]
-        voiceFilePaths = output[1]
-        voiceFilePaths = voiceFilePaths[1:-1] #detach '{', '}'
-        print(status, voiceFilePaths)
+        self.finalNumMsg = output[1]
+        self.voiceFilePaths = output[2]
+        #voiceFilePaths = voiceFilePaths[1:-1] #detach '[', ']'
+        print(status, self.finalNumMsg, self.voiceFilePaths)
 
+        if status == '200': #success
+            self.notice.setText("저장소 토큰을 얻어오고 있습니다...")
+
+            getToken = QProcess(self)
+            getToken.finished.connect(self.getTokenFinished)
+            getToken.start('python', ['getToken.py'])
+            self.getToken = getToken
+        else: #fail
+            self.notice.setText("Something wrong.. Try again!")
+    
+    def getTokenFinished(self, exitCode, exitStatus):
+        output = str(self.getToken.readAll())
+        output = output[2:-1] #detach first "b'", last "'"
+        output = list(output.split("\\r\\n"))
+        status = output[0]
+        self.token = output[1]
+        print(status, self.token)
+        
         if status == '200': #success
             self.notice.setText("파일을 전송하고 있습니다...")
 
             sendFiles = QProcess(self)
             sendFiles.finished.connect(self.sendFilesFinished)
-            sendFiles.start('python', ['test.py'])
+            sendFiles.start('python', ['sendFiles.py',
+                                      '--ip', self.textIP,
+                                      '--path', self.voiceFilePaths,
+                                      '--token', self.token,
+                                       '--numMsg', str(self.finalNumMsg)])
+            self.sendFiles = sendFiles
         else: #fail
             self.notice.setText("Something wrong.. Try again!")
 
+
     def sendFilesFinished(self, exitCode, exitStatus):
+        print(str(self.sendFiles.readAll()))
         print(exitCode)
+        print("---******8-------")
         if exitCode == 0:
             self.notice.setText("라디오에 송출 중입니다...")
 
             executeRadio = QProcess(self)
             executeRadio.finished.connect(self.executeRadioFinished)
-            executeRadio.start('python', ['test.py'])
+            executeRadio.start('python', ['executeRadios.py',
+                                          '--ip', self.textIP,
+                                          '--filename', self.voiceFilePaths,
+                                          '--frequency', self.frequency])
+            self.executeRadio = executeRadio
         else:
             self.notice.setText("Something wrong.. Try again!")
 
     def executeRadioFinished(self, exitCode, exitStatus):
         print(exitCode)
+        print("&&&&&&&&&&&&&&&")
+        print(str(self.executeRadio.readAll()))
         if exitCode == 0:
             self.notice.setText("자동 전송 완료!")
         else:

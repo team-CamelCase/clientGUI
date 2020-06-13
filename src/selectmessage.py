@@ -15,7 +15,7 @@ class selectMessage(QDialog):
         
     def initUI(self):
         self.setWindowTitle('Auto Message Transmission')
-        self.setGeometry(100, 100, 400, 300)
+        self.setGeometry(100, 100, 700, 400)
         
         layout = QVBoxLayout()
         layout.addStretch(1)
