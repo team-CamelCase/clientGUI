@@ -10,6 +10,8 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
+    print(args.filename)
+
     #ssh client connection to rasberry pi
     cli = paramiko.SSHClient()
     cli.set_missing_host_key_policy(paramiko.AutoAddPolicy)
@@ -19,8 +21,14 @@ if __name__ == '__main__':
     pwd = "camelcase"
 
     cli.connect(ip, port = 22, username = user, password = pwd)
-    cmd = "./pifm " + args.filename + " " + args.frequency
-    stdin, stdout, stderr = cli.exec_command(cmd)
+    #cmd = "sudo su"
+    directoryPath = "./Desktop/test2/fm_transmitter-master/"
+    #cmd = "sox -t wav {0}{1} -r 25000 -c 1 -b 16 -t wav - | sudo ./fm_transmitter-master/fm_transmitter -f {2} -".format(directoryPath, "voice.wav", "100.0")
+    stdin, stdout, stderr = cli.exec_command("sox -t wav {0}{1} -r 25000 -c 1 -b 16 -t wav - | sudo ./fm_transmitter-master/fm_transmitter -f {2} -".format(directoryPath, args.filename, args.frequency))
+    #print(cmd)
+    #stdin, stdout, stderr = cli.exec_command(cmd)
+    print(stdout)
+    print(stderr)
     lines = stdout.readlines()
     print(''.join(lines))
     #print status code
